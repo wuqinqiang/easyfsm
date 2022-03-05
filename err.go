@@ -7,7 +7,7 @@ type UnKnownBusinessError struct {
 }
 
 func (businessErr UnKnownBusinessError) Error() string {
-	return string(businessErr.businessName) + " is not registered"
+	return string(businessErr.businessName) + "is not registered"
 }
 
 type UnKnownStateError struct {
