@@ -21,7 +21,7 @@ func NewFSM(businessName BusinessName, initState State) (fsm *FSM) {
 }
 
 // Call call the state's event func
-func (f *FSM) Call(event EventName, opts ...ParamOption) (State, error) {
+func (f *FSM) Call(eventName EventName, opts ...ParamOption) (State, error) {
 	businessMap, ok := stateMachineMap[f.businessName]
 	if !ok {
 		return 0, UnKnownBusinessError{businessName: f.businessName}
@@ -36,19 +36,19 @@ func (f *FSM) Call(event EventName, opts ...ParamOption) (State, error) {
 		fn(opt)
 	}
 
-	eventEntity, ok := events[event]
+	eventEntity, ok := events[eventName]
 	if !ok || eventEntity == nil {
-		return 0, UnKnownEventError{businessName: f.businessName, state: f.getState(), event: event}
+		return 0, UnKnownEventError{businessName: f.businessName, state: f.getState(), event: eventName}
 	}
 
-	// call event func
+	// call eventName func
 	state, err := eventEntity.Execute(opt)
 	if err != nil {
 		return 0, err
 	}
 	oldState := f.getState()
 	f.setState(state)
-	log.DefaultLogger.Log(log.LevelInfo, "event:", event,
+	log.DefaultLogger.Log(log.LevelInfo, "eventName:", eventName,
 		"beforeState:", oldState, "afterState:", f.getState())
 	return f.getState(), nil
 }
