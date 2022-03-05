@@ -8,7 +8,7 @@ type (
 	ParamOption func(*Param)
 )
 
-// Param 定义 EventFunc 所需参数
+// Param is a the parameter you need to execute the event function.
 type Param struct {
 	ctx   context.Context
 	param interface{}

@@ -1,32 +1,38 @@
 package easyfsm
 
 type (
+	// EventEntity is the core that wraps the basic Event methods.
 	EventEntity struct {
 		hook      EventHook
 		eventName EventName
 		observers []EventObserver
-		handler   EventFunc
+		eventFunc EventFunc
 	}
 
 	EventEntityOpt func(entity *EventEntity)
 
+	// EventFunc is the function that will be called when the event is triggered.
 	EventFunc func(opt *Param) (State, error)
 
+	// EventObserver is the interface.When the event is processed,
+	//  it can notify the observers asynchronously and execute their own business.
 	EventObserver interface {
 		Receive(opt *Param)
 	}
 
+	// EventHook is the interface that user can implement to hook the event func.
 	EventHook interface {
 		Before(opt *Param)
 		After(opt Param, state State, err error)
 	}
 )
 
+// NewEventEntity creates a new EventEntity.
 func NewEventEntity(event EventName, handler EventFunc,
 	opts ...EventEntityOpt) *EventEntity {
 	entity := &EventEntity{
 		eventName: event,
-		handler:   handler,
+		eventFunc: handler,
 		observers: make([]EventObserver, 0),
 	}
 	for _, opt := range opts {
@@ -35,6 +41,7 @@ func NewEventEntity(event EventName, handler EventFunc,
 	return entity
 }
 
+// WithObservers adds observers to the event.
 func WithObservers(observers ...EventObserver) EventEntityOpt {
 	return func(entity *EventEntity) {
 		if len(observers) == 0 {
@@ -44,6 +51,7 @@ func WithObservers(observers ...EventObserver) EventEntityOpt {
 	}
 }
 
+// WithHook adds hook to the event
 func WithHook(hook EventHook) EventEntityOpt {
 	return func(entity *EventEntity) {
 		if hook == nil {
@@ -53,12 +61,14 @@ func WithHook(hook EventHook) EventEntityOpt {
 	}
 }
 
-func (e *EventEntity) handlerEvent(param *Param) (State, error) {
+// Execute executes the event.
+func (e *EventEntity) Execute(param *Param) (State, error) {
 	if e.hook != nil {
 		e.hook.Before(param)
 	}
-	state, err := e.handler(param)
+	state, err := e.eventFunc(param)
 	if e.hook != nil {
+		// post operation Not allowed to modify the param
 		forkParam := *param
 		e.hook.After(forkParam, state, err)
 	}
@@ -66,6 +76,7 @@ func (e *EventEntity) handlerEvent(param *Param) (State, error) {
 		return state, err
 	}
 
+	// Asynchronous notify observers
 	GoSafe(func() {
 		e.notify(param)
 	})
