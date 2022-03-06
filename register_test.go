@@ -56,8 +56,7 @@ func TestRegisterStateMachine(t *testing.T) {
 	// clear
 	stateMachineMap = make(map[BusinessName]map[State]map[EventName]*EventEntity)
 	for i := range args {
-		RegisterStateMachine(businessName, args[i].state,
-			args[i].eventName, &args[i].entity)
+		RegisterStateMachine(businessName, args[i].state, &args[i].entity)
 	}
 	commonTest(args, businessName, t)
 
@@ -75,8 +74,7 @@ func TestRegisterStateMachineForConcurrent(t *testing.T) {
 		wg.Add(1)
 		go func(index int) {
 			defer wg.Done()
-			RegisterStateMachine(businessName, args[index].state,
-				args[index].eventName, &args[index].entity)
+			RegisterStateMachine(businessName, args[index].state, &args[index].entity)
 		}(i)
 	}
 	wg.Wait()
