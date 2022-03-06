@@ -134,8 +134,8 @@ func TestEventEntity_Execute_Success(t *testing.T) {
 		OrderId string
 	}
 	param := &Param{
-		ctx:   context.TODO(),
-		param: CreateOrderPar{OrderId: "wuqq0223"},
+		Ctx:  context.TODO(),
+		Data: CreateOrderPar{OrderId: "wuqq0223"},
 	}
 	state, err := entity.Execute(param)
 
@@ -162,8 +162,8 @@ func TestEventEntity_Execute_Err(t *testing.T) {
 		OrderId string
 	}
 	param := &Param{
-		ctx:   context.TODO(),
-		param: CreateOrderPar{OrderId: "wuqq0223"},
+		Ctx:  context.TODO(),
+		Data: CreateOrderPar{OrderId: "wuqq0223"},
 	}
 	state, err := entity.Execute(param)
 
