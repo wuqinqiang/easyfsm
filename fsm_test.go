@@ -6,14 +6,13 @@ import (
 )
 
 var (
-	businessName = BusinessName("business_order")
+	DefaultBusinessName = BusinessName("business_order")
 )
 
 func Init() {
 	args := DefaultArgList()
 	for i := range DefaultArgList() {
-		RegisterStateMachine(businessName, args[i].state,
-			args[i].eventName, &args[i].entity)
+		RegisterStateMachine(DefaultBusinessName, args[i].state, &args[i].entity)
 	}
 }
 
@@ -21,9 +20,9 @@ func TestNewFSM(t *testing.T) {
 	initState := State(0)
 	wantFsm := &FSM{
 		state:        initState,
-		businessName: businessName,
+		businessName: DefaultBusinessName,
 	}
-	fsm := NewFSM(businessName, initState)
+	fsm := NewFSM(DefaultBusinessName, initState)
 
 	if !reflect.DeepEqual(fsm, wantFsm) {
 		t.Errorf("fsm %v want %v", fsm, wantFsm)
@@ -76,7 +75,7 @@ func TestFSM_Call(t *testing.T) {
 			state:     State(3),
 			eventName: EventName("no_state"),
 			wantRes: wantRes{
-				error: UnKnownStateError{businessName: businessName, state: State(3)},
+				error: UnKnownStateError{businessName: DefaultBusinessName, state: State(3)},
 				state: 0,
 			},
 		},
@@ -84,7 +83,7 @@ func TestFSM_Call(t *testing.T) {
 			state:     State(1),
 			eventName: EventName("no_event"),
 			wantRes: wantRes{
-				error: UnKnownEventError{businessName: businessName,
+				error: UnKnownEventError{businessName: DefaultBusinessName,
 					event: EventName("no_event"), state: State(1)},
 				state: 0,
 			},
@@ -92,7 +91,7 @@ func TestFSM_Call(t *testing.T) {
 	}
 
 	for i := range args {
-		fsm := NewFSM(businessName, args[i].state)
+		fsm := NewFSM(DefaultBusinessName, args[i].state)
 		resState, err := fsm.Call(args[i].eventName)
 		if err != args[i].wantRes.error {
 			t.Errorf("err %v want %v", err, args[i].wantRes.error)
