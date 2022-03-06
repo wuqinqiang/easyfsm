@@ -24,11 +24,11 @@ func NewFSM(businessName BusinessName, initState State) (fsm *FSM) {
 func (f *FSM) Call(eventName EventName, opts ...ParamOption) (State, error) {
 	businessMap, ok := stateMachineMap[f.businessName]
 	if !ok {
-		return 0, UnKnownBusinessError{businessName: f.businessName}
+		return f.getState(), UnKnownBusinessError{businessName: f.businessName}
 	}
 	events, ok := businessMap[f.getState()]
 	if !ok || events == nil {
-		return 0, UnKnownStateError{businessName: f.businessName, state: f.getState()}
+		return f.getState(), UnKnownStateError{businessName: f.businessName, state: f.getState()}
 	}
 
 	opt := new(Param)
@@ -38,13 +38,13 @@ func (f *FSM) Call(eventName EventName, opts ...ParamOption) (State, error) {
 
 	eventEntity, ok := events[eventName]
 	if !ok || eventEntity == nil {
-		return 0, UnKnownEventError{businessName: f.businessName, state: f.getState(), event: eventName}
+		return f.getState(), UnKnownEventError{businessName: f.businessName, state: f.getState(), event: eventName}
 	}
 
 	// call eventName func
 	state, err := eventEntity.Execute(opt)
 	if err != nil {
-		return 0, err
+		return f.getState(), err
 	}
 	oldState := f.getState()
 	f.setState(state)
