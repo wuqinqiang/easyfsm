@@ -77,7 +77,7 @@ func TestFSM_Call(t *testing.T) {
 			eventName: EventName("no_state"),
 			wantRes: wantRes{
 				error: UnKnownStateError{businessName: businessName, state: State(3)},
-				state: 0,
+				state: State(3),
 			},
 		},
 		{
@@ -86,7 +86,7 @@ func TestFSM_Call(t *testing.T) {
 			wantRes: wantRes{
 				error: UnKnownEventError{businessName: businessName,
 					event: EventName("no_event"), state: State(1)},
-				state: 0,
+				state: State(1),
 			},
 		},
 	}
