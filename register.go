@@ -13,18 +13,24 @@ func init() {
 }
 
 //RegisterStateMachine register state machine
-func RegisterStateMachine(name BusinessName, state State,
-	event EventName, entity *EventEntity) {
+func RegisterStateMachine(name BusinessName, state State, events ...*EventEntity) {
 	locker.Lock()
 	defer locker.Unlock()
-	if entity == nil {
+	if len(events) == 0 {
 		return
 	}
+
 	if stateMachineMap[name] == nil {
 		stateMachineMap[name] = make(map[State]map[EventName]*EventEntity)
 	}
 	if stateMachineMap[name][state] == nil {
 		stateMachineMap[name][state] = make(map[EventName]*EventEntity)
 	}
-	stateMachineMap[name][state][event] = entity
+
+	for _, event := range events {
+		if event == nil || event.eventName == "" || event.eventFunc == nil {
+			continue
+		}
+		stateMachineMap[name][state][event.eventName] = event
+	}
 }
