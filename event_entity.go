@@ -68,7 +68,7 @@ func (e *EventEntity) Execute(param *Param) (State, error) {
 	}
 	state, err := e.eventFunc(param)
 	if e.hook != nil {
-		// post operation Not allowed to modify the param
+		// post operation Not allowed to modify the Data
 		forkParam := *param
 		e.hook.After(forkParam, state, err)
 	}
