@@ -111,21 +111,21 @@ func main() {
 	fsm = easyfsm.NewFSM("goods", paidState)
 	currentState, err = fsm.Call(cancelOrderEventName,
 		easyfsm.WithData(orderParam{OrderNo: "wuqinqiang050@gmail.com"}))
-	fmt.Printf("[UnKnowBusiness]faild :%v\n", err)
+	fmt.Printf("[UnKnowBusiness]faild: %v\n", err)
 	fmt.Printf("[UnKnowBusiness]faild state:%v\n", currentState)
 
 	//异常情况1,没有定义状态:2
 	fsm = easyfsm.NewFSM(businessName, easyfsm.State(2))
 	currentState, err = fsm.Call(cancelOrderEventName,
 		easyfsm.WithData(orderParam{OrderNo: "wuqinqiang050@gmail.com"}))
-	fmt.Printf("[UnKnowState]faild :%v\n", err)
+	fmt.Printf("[UnKnowState]faild: %v\n", err)
 	fmt.Printf("[UnKnowState]faild state:%v\n", currentState)
 
 	//异常情况2:没有定义状态1对应的发货事件
 	fsm = easyfsm.NewFSM(businessName, initState)
 	currentState, err = fsm.Call("shippingEvent",
 		easyfsm.WithData(orderParam{OrderNo: "wuqinqiang050@gmail.com"}))
-	fmt.Printf("[UnKnowEvent]faild :%v\n", err)
+	fmt.Printf("[UnKnowEvent]faild: %v\n", err)
 	fmt.Printf("[UnKnowEvent]faild state:%v\n", currentState)
 
 }
@@ -161,15 +161,15 @@ type (
 )
 
 func (h HookExample) Before(opt *easyfsm.Param) {
-	println("事件执行前")
+	fmt.Println("事件执行前")
 }
 
 func (h HookExample) After(opt easyfsm.Param, state easyfsm.State, err error) {
-	println("事件执行后")
+	fmt.Println("事件执行后")
 }
 
 func (o NotifyExample) Receive(opt *easyfsm.Param) {
-	println("接收到事件变动,发送消息")
+	fmt.Println("接收到事件变动,发送消息")
 }
 ```
 
@@ -180,8 +180,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/wuqinqiang/easyfsm"
 	"time"
+
+	"github.com/wuqinqiang/easyfsm"
 )
 
 var (
@@ -217,15 +218,15 @@ type (
 )
 
 func (h HookExample) Before(opt *easyfsm.Param) {
-	println("事件执行前")
+	fmt.Println("事件执行前")
 }
 
 func (h HookExample) After(opt easyfsm.Param, state easyfsm.State, err error) {
-	println("事件执行后")
+	fmt.Println("事件执行后")
 }
 
 func (o NotifyExample) Receive(opt *easyfsm.Param) {
-	println("接收到事件变动,发送消息")
+	fmt.Println("接收到事件变动,发送消息")
 }
 
 func init() {
