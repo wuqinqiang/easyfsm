@@ -161,15 +161,15 @@ type (
 )
 
 func (h HookExample) Before(opt *easyfsm.Param) {
-	println("事件执行前")
+	fmt.Println("事件执行前")
 }
 
 func (h HookExample) After(opt easyfsm.Param, state easyfsm.State, err error) {
-	println("事件执行后")
+    fmt.Println("事件执行后")
 }
 
 func (o NotifyExample) Receive(opt *easyfsm.Param) {
-	println("接收到事件变动,发送消息")
+    fmt.Println("接收到事件变动,发送消息")
 }
 ```
 
@@ -217,15 +217,15 @@ type (
 )
 
 func (h HookExample) Before(opt *easyfsm.Param) {
-	println("事件执行前")
+	fmt.Println("事件执行前")
 }
 
 func (h HookExample) After(opt easyfsm.Param, state easyfsm.State, err error) {
-	println("事件执行后")
+	fmt.Println("事件执行后")
 }
 
 func (o NotifyExample) Receive(opt *easyfsm.Param) {
-	println("接收到事件变动,发送消息")
+	fmt.Println("接收到事件变动,发送消息")
 }
 
 func init() {

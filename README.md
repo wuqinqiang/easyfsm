@@ -1,4 +1,4 @@
-Translate to: [简体中文]{https://github.com/wuqinqiang/easyfsm/blob/main/README_zh-CN.md}
+Translate to: [简体中文](https://github.com/wuqinqiang/easyfsm/blob/main/README_zh-CN.md)
 
 ### About Easyfsm
 
@@ -113,21 +113,21 @@ func main() {
 	fsm = easyfsm.NewFSM("goods", paidState)
 	currentState, err = fsm.Call(cancelOrderEventName,
 		easyfsm.WithData(orderParam{OrderNo: "wuqinqiang050@gmail.com"}))
-	fmt.Printf("[UnKnowBusiness]faild :%v\n", err)
+	fmt.Printf("[UnKnowBusiness]faild: %v\n", err)
 	fmt.Printf("[UnKnowBusiness]faild state:%v\n", currentState)
 
 	//Exception 2, no state defined:2
 	fsm = easyfsm.NewFSM(businessName, easyfsm.State(2))
 	currentState, err = fsm.Call(cancelOrderEventName,
 		easyfsm.WithData(orderParam{OrderNo: "wuqinqiang050@gmail.com"}))
-	fmt.Printf("[UnKnowState]faild :%v\n", err)
+	fmt.Printf("[UnKnowState]faild: %v\n", err)
 	fmt.Printf("[UnKnowState]faild state:%v\n", currentState)
 
 	// Exception 3,The shipping event corresponding to state 1 is not defined
 	fsm = easyfsm.NewFSM(businessName, initState)
 	currentState, err = fsm.Call("shippingEvent",
 		easyfsm.WithData(orderParam{OrderNo: "wuqinqiang050@gmail.com"}))
-	fmt.Printf("[UnKnowEvent]faild :%v\n", err)
+	fmt.Printf("[UnKnowEvent]faild: %v\n", err)
 	fmt.Printf("[UnKnowEvent]faild state:%v\n", currentState)
 
 }
@@ -163,15 +163,15 @@ type (
 )
 
 func (h HookExample) Before(opt *easyfsm.Param) {
-	println("Before event execution")
+     fmt.Println("Before event execution")
 }
 
 func (h HookExample) After(opt easyfsm.Param, state easyfsm.State, err error) {
-	println("After event execution")
+     fmt.Println("After event execution")
 }
 
 func (o NotifyExample) Receive(opt *easyfsm.Param) {
-	println("Receive events, send messages")
+     fmt.Println("Receive events, send messages")
 }
 ```
 
@@ -182,8 +182,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/wuqinqiang/easyfsm"
 	"time"
+
+	"github.com/wuqinqiang/easyfsm"
 )
 
 var (
@@ -219,15 +220,15 @@ type (
 )
 
 func (h HookExample) Before(opt *easyfsm.Param) {
-	println("Before event execution")
+	fmt.Println("Before event execution")
 }
 
 func (h HookExample) After(opt easyfsm.Param, state easyfsm.State, err error) {
-	println("After event execution")
+	fmt.Println("After event execution")
 }
 
 func (o NotifyExample) Receive(opt *easyfsm.Param) {
-	println("Receive events, send messages")
+	fmt.Println("Receive events, send messages")
 }
 
 func init() {
