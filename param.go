@@ -8,7 +8,7 @@ type (
 	ParamOption func(*Param)
 )
 
-// Param is a the parameter you need to execute the event function.
+// Param is a parameter you need to execute the event function.
 type Param struct {
 	Ctx  context.Context
 	Data interface{}
@@ -20,8 +20,8 @@ func WithCtx(ctx context.Context) ParamOption {
 	}
 }
 
-func WithData(param interface{}) ParamOption {
+func WithData(data interface{}) ParamOption {
 	return func(opt *Param) {
-		opt.Data = param
+		opt.Data = data
 	}
 }

@@ -1,6 +1,7 @@
 package easyfsm
 
 import (
+	"context"
 	"github.com/wuqinqiang/easyfsm/log"
 )
 
@@ -20,7 +21,7 @@ func NewFSM(businessName BusinessName, initState State) (fsm *FSM) {
 	return
 }
 
-// Call call the state's event func
+// Call the state's event func
 func (f *FSM) Call(eventName EventName, opts ...ParamOption) (State, error) {
 	businessMap, ok := stateMachineMap[f.businessName]
 	if !ok {
@@ -31,9 +32,11 @@ func (f *FSM) Call(eventName EventName, opts ...ParamOption) (State, error) {
 		return f.getState(), UnKnownStateError{businessName: f.businessName, state: f.getState()}
 	}
 
-	opt := new(Param)
+	param := new(Param)
+	// Default ctx
+	param.Ctx = context.TODO()
 	for _, fn := range opts {
-		fn(opt)
+		fn(param)
 	}
 
 	eventEntity, ok := events[eventName]
@@ -42,7 +45,7 @@ func (f *FSM) Call(eventName EventName, opts ...ParamOption) (State, error) {
 	}
 
 	// call eventName func
-	state, err := eventEntity.Execute(opt)
+	state, err := eventEntity.Execute(param)
 	if err != nil {
 		return f.getState(), err
 	}
