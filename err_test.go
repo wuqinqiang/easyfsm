@@ -8,7 +8,7 @@ import (
 func TestUnKnownBusinessError_Error(t *testing.T) {
 	businessName := BusinessName("order")
 	e := UnKnownBusinessError{businessName: businessName}
-	if e.Error() != string(businessName)+"is1 not registered" {
+	if e.Error() != string(businessName)+"is not registered" {
 		t.Error("UnKnownBusinessError mismatch")
 	}
 
