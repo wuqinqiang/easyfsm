@@ -1,6 +1,9 @@
 package easyfsm
 
-import "github.com/wuqinqiang/easyfsm/log"
+import (
+	"context"
+	"github.com/wuqinqiang/easyfsm/log"
+)
 
 func GoSafe(fn func()) {
 	go goSafe(fn)
@@ -13,4 +16,8 @@ func goSafe(fn func()) {
 		}
 	}()
 	fn()
+}
+
+type ForkCtxInterface interface {
+	ForkCtx(ctx context.Context) context.Context
 }

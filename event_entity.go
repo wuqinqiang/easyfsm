@@ -1,5 +1,7 @@
 package easyfsm
 
+import "context"
+
 type (
 	// EventEntity is the core that wraps the basic Event methods.
 	EventEntity struct {
@@ -7,6 +9,8 @@ type (
 		eventName EventName
 		observers []EventObserver
 		eventFunc EventFunc
+		// issue:https://github.com/wuqinqiang/easyfsm/issues/16
+		forkCtxFunc func(ctx context.Context) context.Context
 	}
 
 	EventEntityOpt func(entity *EventEntity)
@@ -34,6 +38,9 @@ func NewEventEntity(event EventName, handler EventFunc,
 		eventName: event,
 		eventFunc: handler,
 		observers: make([]EventObserver, 0),
+		forkCtxFunc: func(ctx context.Context) context.Context {
+			return context.Background()
+		},
 	}
 	for _, opt := range opts {
 		opt(entity)
@@ -61,6 +68,12 @@ func WithHook(hook EventHook) EventEntityOpt {
 	}
 }
 
+func WithForkCtxFunc(fn func(ctx context.Context) context.Context) EventEntityOpt {
+	return func(entity *EventEntity) {
+		entity.forkCtxFunc = fn
+	}
+}
+
 // Execute executes the event.
 func (e *EventEntity) Execute(param *Param) (State, error) {
 	if e.hook != nil {
@@ -78,6 +91,7 @@ func (e *EventEntity) Execute(param *Param) (State, error) {
 
 	// Asynchronous notify observers
 	GoSafe(func() {
+		param.Ctx = e.forkCtxFunc(param.Ctx)
 		e.notify(param)
 	})
 	return state, nil
