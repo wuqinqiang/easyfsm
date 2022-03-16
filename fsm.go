@@ -45,7 +45,7 @@ func (f *FSM) Call(eventName EventName, opts ...ParamOption) (State, error) {
 	}
 
 	// call eventName func
-	state, err := eventEntity.Execute(param)
+	state, err := eventEntity.execute(param)
 	if err != nil {
 		return f.getState(), err
 	}

@@ -1,6 +1,7 @@
 package easyfsm
 
 import (
+	"context"
 	"sync"
 	"testing"
 )
@@ -8,7 +9,7 @@ import (
 type arg struct {
 	state     State
 	eventName EventName
-	entity    EventEntity
+	entity    *EventEntity
 }
 
 func DefaultArgList() []arg {
@@ -19,54 +20,46 @@ func DefaultArgList() []arg {
 	args = append(args, arg{
 		state:     0,
 		eventName: "crateOrder",
-		entity: EventEntity{
-			eventName: "crateOrder",
-			eventFunc: func(opt *Param) (State, error) {
-				return State(1), nil
-			},
-		},
+		entity: NewEventEntity("crateOrder", func(opt *Param) (State, error) {
+			return State(1), nil
+		}),
 	},
 		arg{
 			state:     1,
 			eventName: "payOrder",
-			entity: EventEntity{
-				eventName: "payOrder",
-				eventFunc: func(opt *Param) (State, error) {
+			entity: NewEventEntity(
+				"payOrder",
+				func(opt *Param) (State, error) {
 					return State(2), nil
-				},
-			},
+				}),
 		},
 		arg{
 			state:     1,
 			eventName: "cancelOrder",
-			entity: EventEntity{
-				eventName: "cancelOrder",
-				eventFunc: func(opt *Param) (State, error) {
+			entity: NewEventEntity(
+				"cancelOrder",
+				func(opt *Param) (State, error) {
 					return State(3), nil
-				},
-			},
+				}),
 		},
 	)
 	return args
 }
 
+//
 func TestRegisterStateMachine(t *testing.T) {
-	businessName := BusinessName("business_order")
+	businessName := BusinessName("TestRegisterStateMachine")
 	args := DefaultArgList()
-	// clear
-	stateMachineMap = make(map[BusinessName]map[State]map[EventName]*EventEntity)
 	for i := range args {
-		RegisterStateMachine(businessName, args[i].state, &args[i].entity)
+		RegisterStateMachine(businessName, args[i].state, args[i].entity)
 	}
 	commonTest(args, businessName, t)
 
 }
 
 func TestRegisterStateMachineForConcurrent(t *testing.T) {
-	businessName := BusinessName("business_order")
+	businessName := BusinessName("TestRegisterStateMachineForConcurrent")
 	args := DefaultArgList()
-	// clear
-	stateMachineMap = make(map[BusinessName]map[State]map[EventName]*EventEntity)
 	var (
 		wg sync.WaitGroup
 	)
@@ -74,11 +67,10 @@ func TestRegisterStateMachineForConcurrent(t *testing.T) {
 		wg.Add(1)
 		go func(index int) {
 			defer wg.Done()
-			RegisterStateMachine(businessName, args[index].state, &args[index].entity)
+			RegisterStateMachine(businessName, args[index].state, args[index].entity)
 		}(i)
 	}
 	wg.Wait()
-
 	commonTest(args, businessName, t)
 }
 
@@ -101,8 +93,10 @@ func commonTest(args []arg, businessName BusinessName, t *testing.T) {
 			t.Errorf("entity  shouldn't be nil")
 		}
 
-		state, err := entity.Execute(nil)
-		wantState, wantErr := args[j].entity.Execute(nil)
+		param := &Param{Ctx: context.TODO()}
+
+		state, err := entity.execute(param)
+		wantState, wantErr := args[j].entity.execute(param)
 		if err != nil {
 			t.Errorf("err %v want:%v", err, wantErr)
 		}

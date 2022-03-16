@@ -45,15 +45,17 @@ func TestNewEventEntityNoOption(t *testing.T) {
 	handler := func(opt *Param) (State, error) {
 		return State(1), nil
 	}
+	testKey := "remember"
+	testVal := "ok"
 
-	wantEntity := EventEntity{
-		eventName: EventName(eventName),
-		eventFunc: handler,
-		observers: make([]EventObserver, 0),
+	forkCtxFunc := func(ctx context.Context) context.Context {
+		return context.WithValue(ctx, testKey, testVal)
 	}
 
+	wantEntity := NewEventEntity(EventName(eventName), handler, WithForkCtxFunc(forkCtxFunc))
+
 	t.Run(businessName, func(t *testing.T) {
-		got := NewEventEntity(EventName(eventName), handler)
+		got := NewEventEntity(EventName(eventName), handler, WithForkCtxFunc(forkCtxFunc))
 
 		if !reflect.DeepEqual(got.eventName, wantEntity.eventName) {
 			t.Errorf("eventEntity name =%v,want %v", got.eventName, wantEntity.eventName)
@@ -66,6 +68,12 @@ func TestNewEventEntityNoOption(t *testing.T) {
 		if !funcEqual(got.eventFunc, wantEntity.eventFunc) {
 			t.Errorf("eventEntity handler =%v,want %v", got.eventFunc, wantEntity.eventFunc)
 		}
+		ctx := got.forkCtxFunc(context.Background())
+		val := ctx.Value(testKey).(string)
+		if val != testVal {
+			t.Errorf("eventEntity ctxText =%v,want %v", val, testVal)
+		}
+
 	})
 }
 
@@ -76,23 +84,13 @@ func TestNewEventEntityWithObservers(t *testing.T) {
 		return State(1), nil
 	}
 
-	wantEntity := EventEntity{
-		eventName: EventName(eventName),
-		eventFunc: handler,
-		observers: []EventObserver{ObserverTest{}},
-	}
+	wantEntity := NewEventEntity(EventName(eventName), handler, WithObservers(ObserverTest{}))
 
 	t.Run(businessName, func(t *testing.T) {
 		got := NewEventEntity(EventName(eventName), handler, WithObservers(ObserverTest{}))
-
-		if !reflect.DeepEqual(got.observers, wantEntity.observers) {
-			t.Errorf("eventEntity observers =%v,want %v", got.observers, wantEntity.observers)
+		if len(got.observers) != 1 {
+			t.Errorf("eventEntity observers len =%v,want %v", got.observers, wantEntity.observers)
 		}
-
-		if !reflect.DeepEqual(got.hook, wantEntity.hook) {
-			t.Errorf("eventEntity hook =%v,want %v", got.hook, wantEntity.hook)
-		}
-
 	})
 }
 
@@ -103,12 +101,7 @@ func TestNewEventEntityWithHook(t *testing.T) {
 		return State(1), nil
 	}
 
-	wantEntity := EventEntity{
-		eventName: EventName(eventName),
-		eventFunc: handler,
-		hook:      HookTest{},
-		observers: make([]EventObserver, 0),
-	}
+	wantEntity := NewEventEntity(EventName(eventName), handler, WithHook(HookTest{}))
 
 	t.Run(businessName, func(t *testing.T) {
 		got := NewEventEntity(EventName(eventName), handler, WithHook(HookTest{}))
@@ -137,20 +130,19 @@ func TestEventEntity_Execute_Success(t *testing.T) {
 		Ctx:  context.TODO(),
 		Data: CreateOrderPar{OrderId: "wuqq0223"},
 	}
-	state, err := entity.Execute(param)
+	state, err := entity.execute(param)
 
 	wantState, wantErr := handler(param)
 	if err != nil {
-		t.Errorf("Execute err %v ,want %v", err, wantErr)
+		t.Errorf("execute err %v ,want %v", err, wantErr)
 	}
 
 	if state != wantState {
-		t.Errorf("Execute state %v ,want %v", err, wantErr)
+		t.Errorf("execute state %v ,want %v", err, wantErr)
 	}
 }
 
 func TestEventEntity_Execute_Err(t *testing.T) {
-
 	paidErr := fmt.Errorf("paid err")
 	eventName := "paid_order"
 	handler := func(opt *Param) (State, error) {
@@ -165,13 +157,13 @@ func TestEventEntity_Execute_Err(t *testing.T) {
 		Ctx:  context.TODO(),
 		Data: CreateOrderPar{OrderId: "wuqq0223"},
 	}
-	state, err := entity.Execute(param)
+	state, err := entity.execute(param)
 
 	wantState, wantErr := handler(param)
 	if err == nil || !errors.Is(err, paidErr) {
-		t.Errorf("Execute err %v ,want %v", err, wantErr)
+		t.Errorf("execute err %v ,want %v", err, wantErr)
 	}
 	if state != wantState {
-		t.Errorf("Execute state %v ,want %v", err, wantErr)
+		t.Errorf("execute state %v ,want %v", err, wantErr)
 	}
 }
