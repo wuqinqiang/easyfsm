@@ -74,8 +74,8 @@ func WithForkCtxFunc(fn func(ctx context.Context) context.Context) EventEntityOp
 	}
 }
 
-// Execute executes the event.
-func (e *EventEntity) Execute(param *Param) (State, error) {
+// execute executes the event.
+func (e *EventEntity) execute(param *Param) (State, error) {
 	if e.hook != nil {
 		e.hook.Before(param)
 	}

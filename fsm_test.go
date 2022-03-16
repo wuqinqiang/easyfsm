@@ -12,7 +12,7 @@ var (
 func Init() {
 	args := DefaultArgList()
 	for i := range DefaultArgList() {
-		RegisterStateMachine(DefaultBusinessName, args[i].state, &args[i].entity)
+		RegisterStateMachine(DefaultBusinessName, args[i].state, args[i].entity)
 	}
 }
 
@@ -30,8 +30,6 @@ func TestNewFSM(t *testing.T) {
 }
 
 func TestFSM_Call(t *testing.T) {
-	//clear
-	stateMachineMap = make(map[BusinessName]map[State]map[EventName]*EventEntity)
 	Init()
 	type (
 		wantRes struct {

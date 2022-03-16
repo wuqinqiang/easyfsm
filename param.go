@@ -16,6 +16,9 @@ type Param struct {
 
 func WithCtx(ctx context.Context) ParamOption {
 	return func(opt *Param) {
+		if ctx == nil {
+			return
+		}
 		opt.Ctx = ctx
 	}
 }
